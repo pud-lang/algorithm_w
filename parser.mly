@@ -3,11 +3,21 @@
 open Expr
 open Infer
 
+(* 在给定的类型表达式 ty 中替换所有的类型常量（如 int, bool 等）
+   为新生成的类型变量。这通常在类型推导的某些阶段使用，例如泛型
+   函数的实例化。*)
 let replace_ty_constants_with_vars var_name_list ty =
+  (* 这里使用 List.fold_left 函数构建一个环境，它将 var_name_list 
+     中的每个名称映射到一个新生成的泛型类型变量（new_gen_var ()）。
+     初始环境是空的（Env.empty）。 *)
   let env = List.fold_left
     (fun env var_name -> Env.extend env var_name (new_gen_var ()))
     Env.empty var_name_list
   in
+  (* 这是一个递归函数，用于遍历和替换类型表达式中的类型常量。
+     对于类型常量 TConst，如果它的名称在环境中找到了对应的类型变量，
+     则替换它；否则保留原样。对于复合类型（如 TApp 和 TArrow），
+     递归地应用这个函数到它们的子类型上。 *)
   let rec f ty = match ty with
     | TConst name -> begin
         try
