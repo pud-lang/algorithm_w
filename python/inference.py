@@ -1,24 +1,4 @@
-#!/usr/bin/env python
-"""
-.. module:: inference
-   :synopsis: An implementation of the Hindley Milner type checking algorithm
-              based on the Scala code by Andrew Forrest, the Perl code by
-              Nikita Borisov and the paper "Basic Polymorphic Typechecking"
-              by Cardelli.
-.. moduleauthor:: Robert Smallshire
-"""
-
-from __future__ import print_function
-
-
-# =======================================================#
-# Class definitions for the abstract syntax tree nodes
-# which comprise the little language for which types
-# will be inferred
-
 class Lambda(object):
-    """Lambda abstraction"""
-
     def __init__(self, v, body):
         self.v = v
         self.body = body
@@ -28,8 +8,6 @@ class Lambda(object):
 
 
 class Identifier(object):
-    """Identifier"""
-
     def __init__(self, name):
         self.name = name
 
@@ -38,8 +16,6 @@ class Identifier(object):
 
 
 class Apply(object):
-    """Function application"""
-
     def __init__(self, fn, arg):
         self.fn = fn
         self.arg = arg
@@ -49,8 +25,6 @@ class Apply(object):
 
 
 class Let(object):
-    """Let binding"""
-
     def __init__(self, v, defn, body):
         self.v = v
         self.defn = defn
@@ -61,8 +35,6 @@ class Let(object):
 
 
 class Letrec(object):
-    """Letrec binding"""
-
     def __init__(self, v, defn, body):
         self.v = v
         self.defn = defn
@@ -72,43 +44,24 @@ class Letrec(object):
         return "(letrec {v} = {defn} in {body})".format(v=self.v, defn=self.defn, body=self.body)
 
 
-# =======================================================#
-# Exception types
-
 class InferenceError(Exception):
-    """Raised if the type inference algorithm cannot infer types successfully"""
-
     def __init__(self, message):
-        self.__message = message
-
-    message = property(lambda self: self.__message)
+        self.message = message
 
     def __str__(self):
         return str(self.message)
 
 
 class ParseError(Exception):
-    """Raised if the type environment supplied for is incomplete"""
-
     def __init__(self, message):
-        self.__message = message
-
-    message = property(lambda self: self.__message)
+        self.message = message
 
     def __str__(self):
         return str(self.message)
 
 
-# =======================================================#
-# Types and type constructors
-
 class TypeVariable(object):
-    """A type variable standing for an arbitrary type.
-
-    All type variables have a unique id, but names are only assigned lazily,
-    when required.
-    """
-
+    # 用于为每个 TypeVariable 实例分配一个唯一的 ID。
     next_variable_id = 0
 
     def __init__(self):
@@ -117,6 +70,7 @@ class TypeVariable(object):
         self.instance = None
         self.__name = None
 
+    # 用于跟踪下一个可用的变量名称。
     next_variable_name = 'a'
 
     @property
